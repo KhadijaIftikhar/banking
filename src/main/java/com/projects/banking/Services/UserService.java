@@ -16,10 +16,11 @@ public class UserService {
     private UserRepository userRepository;
 
     private static final String NL_IBAN_PREFIX = "NL";
-    private static final String NL_BRANCH_CODE = "ABCD";
-    private static final Random RANDOM = new Random(14);
+    private static final String NL_BRANCH_CODE = "ABNA";
+    private static final Random RANDOM = new Random();
     public String customerGenerateIban() {
-        return IbanGenerator.generateIban(NL_IBAN_PREFIX, NL_BRANCH_CODE, RANDOM.toString());
+        long randomNumber = generateRandomNumber(10, RANDOM);
+        return IbanGenerator.generateIban(NL_IBAN_PREFIX, NL_BRANCH_CODE, Long.toString(randomNumber));
     }
 
     /**
@@ -29,8 +30,6 @@ public class UserService {
      */
     public UserEntity saveCustomer(UserRequest userRequest) {
         UserEntity userEntity = new UserEntity();
-        System.out.println("customerGenerateIban:: "+customerGenerateIban());
-        System.out.println("generateRandomOTP:: "+generateRandomOTP());
         userEntity.setIBAN(customerGenerateIban());
         if(!userRequest.getName().isEmpty()) {
             userEntity.setName(userRequest.getName());
@@ -52,7 +51,21 @@ public class UserService {
      * @return String
      */
     private static String generateRandomOTP() {
-        Random RANDOM = new Random(6);
-        return RANDOM.toString();
+       long otp = generateRandomNumber(6, RANDOM);
+       return Long.toString(otp);
+    }
+
+    private static long generateRandomNumber(int digits, Random random) {
+        // Ensure the digits parameter is valid
+        if (digits <= 0) {
+            throw new IllegalArgumentException("Number of digits must be greater than 0");
+        }
+
+        // Calculate the minimum and maximum values for the specified number of digits
+        long min = (long) Math.pow(10, digits - 1);
+        long max = (long) Math.pow(10, digits) - 1;
+
+        // Generate a positive random number within the specified range
+        return min + Math.abs(random.nextLong()) % (max - min + 1);
     }
 }
