@@ -1,6 +1,7 @@
 package com.projects.banking.Controllers;
 
 import com.google.gson.Gson;
+import com.projects.banking.DTO.OTPRequest;
 import com.projects.banking.DTO.UserRequest;
 import com.projects.banking.Entities.UserEntity;
 import com.projects.banking.ExternalAPIServices.DTO.IPInfoResponse;
@@ -36,7 +37,7 @@ public class AuthController {
         try {
             // Country Validation By IP Address
             String countryCode = IPInfoService.getCountryCode();
-            if(!("NL".equals(countryCode) || "BE".equals(countryCode))){
+            if(!("NL".equals(countryCode) || "BE".equals(countryCode) || "PK".equals(countryCode))){
                 return ResponseEntity.ok("Sorry, you're not eligible for this registration.");
             }
 
@@ -53,16 +54,22 @@ public class AuthController {
             }
         } catch (Exception exception) {
             exception.printStackTrace();
-            return ResponseEntity.badRequest().body("Something went wrong.");
+            return ResponseEntity.badRequest().body("Something went wrong."+ userRequest.getMobileNumber());
         }
         return ResponseEntity.ok("Customer has been Created but need to be Verify by OTP.");
     }
 
     @PostMapping("/verifyOTP")
-    public ResponseEntity<?> verifyOTP (@Valid @RequestBody UserRequest userRequest) {
+    public ResponseEntity<?> verifyOTP (@Valid @RequestBody OTPRequest otpRequest) {
 
         try {
-            TwilioService.VerifyOTP("", "");
+            UserEntity userEntity = userService.findCustomerByUsername(otpRequest.getUsername());
+            if(userEntity.getId() != 0) {
+                TwilioService.VerifyOTP(userEntity.getMobileNumber(), otpRequest.getOTP());
+            } else {
+                return ResponseEntity.ok("Oops, Username not found.");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Something went wrong.");

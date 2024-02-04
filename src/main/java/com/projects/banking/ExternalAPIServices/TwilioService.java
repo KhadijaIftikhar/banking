@@ -14,15 +14,11 @@ public class TwilioService {
 
     private static Environment env;
 
-    private static Service service;
-    public TwilioService() {
-        Twilio.init("AC8401d77a0137656a1dd504302fc42e22", "ae71b5f30129181fd6c12f5522669e45");
-        service = Service.creator("Bank OTP Service").create();
-    }
     public static String initiateTwilio(String mobileNumber) {
-
+        Twilio.init("AC8401d77a0137656a1dd504302fc42e22", "28b81f594efabe6aa1b68f71edc50a68");
+        Service service = Service.creator("Bank OTP Service").create();
         Verification verification = Verification.creator(
-                        service.getSid(), // this is your verification sid
+                        verifySid, // this is your verification sid
                         mobileNumber, //this is your Twilio verified recipient phone number
                         "sms") // this is your channel type
                 .create();
@@ -30,9 +26,10 @@ public class TwilioService {
     }
 
     public static String VerifyOTP (String mobileNumber,String OTP){
-
+        Twilio.init("AC8401d77a0137656a1dd504302fc42e22", "28b81f594efabe6aa1b68f71edc50a68");
+        Service service = Service.creator("Bank OTP Service").create();
         VerificationCheck verificationCheck = VerificationCheck.creator(
-                        service.getSid())
+                        verifySid)
                 .setTo(mobileNumber)
                 .setCode(OTP)
                 .create();

@@ -18,7 +18,7 @@ public class UserService {
     private static final String NL_IBAN_PREFIX = "NL";
     private static final String NL_BRANCH_CODE = "ABNA";
     private static final Random RANDOM = new Random();
-    public String customerGenerateIban() {
+    private String customerGenerateIban() {
         long randomNumber = generateRandomNumber(10, RANDOM);
         return IbanGenerator.generateIban(NL_IBAN_PREFIX, NL_BRANCH_CODE, Long.toString(randomNumber));
     }
@@ -45,6 +45,10 @@ public class UserService {
         userEntity.setIsVerified(0);
         userEntity.setBalance(0.00);
         return userRepository.save(userEntity);
+    }
+
+    public UserEntity findCustomerByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     /**
