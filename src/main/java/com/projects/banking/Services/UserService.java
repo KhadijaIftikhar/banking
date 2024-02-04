@@ -40,6 +40,7 @@ public class UserService {
         userEntity.setDateOfBirth(userRequest.getDateOfBirth());
         userEntity.setIdDocument(userRequest.getIdDocument());
         userEntity.setAccountType("Saving");
+        userEntity.setMobileNumber(userRequest.getMobileNumber());
         userEntity.setOTP(generateRandomOTP());
         userEntity.setIsVerified(0);
         userEntity.setBalance(0.00);

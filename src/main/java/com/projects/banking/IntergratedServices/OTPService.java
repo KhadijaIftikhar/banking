@@ -2,7 +2,6 @@ package com.projects.banking.IntergratedServices;
 
 import com.projects.banking.ExternalAPIServices.InfoBipService;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
