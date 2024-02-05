@@ -46,9 +46,6 @@ public class UserEntity {
     @Column(nullable = false)
     private Integer isVerified;
 
-    @Column(nullable = false)
-    private String OTP;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp

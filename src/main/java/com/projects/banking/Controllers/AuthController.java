@@ -35,12 +35,12 @@ public class AuthController {
             // Country Validation By IP Address
             String countryCode = IPInfoService.getCountryCode();
             if(!("NL".equals(countryCode) || "BE".equals(countryCode) || "PK".equals(countryCode))){
-                return ResponseEntity.ok("Sorry, you're not eligible for this registration.");
+                return ResponseEntity.ok("Sorry, your country not eligible for this registration.");
             }
 
             LocalDate currentDate = LocalDate.now();
             if(AgeCalculator.calculateAge(userRequest.getDateOfBirth(), currentDate) < 18) {
-                return ResponseEntity.ok("Sorry, you're not eligible for this registration.");
+                return ResponseEntity.ok("Sorry, your age not eligible for this registration.");
             }
 
             UserEntity existingUserCheck = userService.findCustomerByUsername(userRequest.getUsername());
