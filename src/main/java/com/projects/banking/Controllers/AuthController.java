@@ -1,7 +1,6 @@
 package com.projects.banking.Controllers;
 
 import com.projects.banking.DTO.CustomerOverviewRequest;
-import com.projects.banking.DTO.CustomerOverviewResponse;
 import com.projects.banking.DTO.OTPRequest;
 import com.projects.banking.DTO.UserRequest;
 import com.projects.banking.Entities.UserEntity;
