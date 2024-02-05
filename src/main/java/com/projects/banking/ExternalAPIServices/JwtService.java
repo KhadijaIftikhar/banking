@@ -2,10 +2,11 @@ package com.projects.banking.ExternalAPIServices;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-
+@Service
 public class JwtService {
 
     private final SecretKey secretKey;
@@ -14,10 +15,11 @@ public class JwtService {
         this.secretKey = secretKey;
     }
 
-    public String createJwt(String subject, long expirationMillis) {
+    public String createJwt(String subject) {
+        long expirationTimeMillis = 3600000; // 1 hour
         return Jwts.builder()
                 .setSubject(subject)
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
                 .signWith(secretKey)
                 .compact();
     }

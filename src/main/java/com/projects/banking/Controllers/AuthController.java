@@ -1,11 +1,12 @@
 package com.projects.banking.Controllers;
 
-import com.projects.banking.DTO.CustomerOverviewRequest;
-import com.projects.banking.DTO.OTPRequest;
-import com.projects.banking.DTO.UserRequest;
+import com.projects.banking.DTO.*;
+import com.projects.banking.Entities.AuthAccessTokenEntity;
 import com.projects.banking.Entities.UserEntity;
 import com.projects.banking.ExternalAPIServices.IPInfoService;
+import com.projects.banking.ExternalAPIServices.JwtService;
 import com.projects.banking.Helpers.AgeCalculator;
+import com.projects.banking.Services.AuthAccessTokenService;
 import com.projects.banking.Services.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,6 +26,10 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AuthAccessTokenService authAccessTokenService;
+
 
 
 
@@ -92,9 +97,28 @@ public class AuthController {
     }
 
     @PostMapping("/logIn")
-    public String logIn() {
-
-        return "";
+    public ResponseEntity<?> logIn(@RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
+        try{
+            // getting any validation errors while creating customer registration
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+            }
+            // BYPASS Password for Now
+            UserEntity userEntity = userService.findCustomerByUsername(loginRequest.getUsername());
+            if(userEntity != null) {
+                AuthAccessTokenEntity token = authAccessTokenService.saveToken(loginRequest,userEntity);
+                LoginResponse loginResponse = new LoginResponse();
+                loginResponse.setUserEntity(userEntity);
+                loginResponse.setToken(token.getToken());
+                loginResponse.setExpiryAt(token.getExpiryAt());
+                return ResponseEntity.ok(loginResponse);
+            } else {
+                return ResponseEntity.ok("Oops, Username not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Something went wrong."+ e.getMessage());
+        }
     }
 
     @GetMapping("/overview")
