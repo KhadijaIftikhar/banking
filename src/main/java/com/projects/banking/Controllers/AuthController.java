@@ -156,12 +156,13 @@ public class AuthController {
                 return ResponseEntity.badRequest().body("Oops, time-out. token has been expired.");
             }
 
-            if(jwtService.validateToken(customerOverviewRequest.getToken()).getId().isEmpty()) {
+            UserEntity userEntity = userService.findCustomerByUsername(customerOverviewRequest.getUsername());
+
+            String token = authAccessTokenService.ValidatedTokenFormDatabase(userEntity.getId()).getToken();
+            if(jwtService.validateToken(customerOverviewRequest.getToken()).getId().isEmpty() ||  jwtService.validateToken(token).getId().isEmpty()) {
                 return ResponseEntity.badRequest().body("Oops, Invalid User!.");
             }
 
-
-            UserEntity userEntity = userService.findCustomerByUsername(customerOverviewRequest.getUsername());
             if(userEntity != null) {
                 return ResponseEntity.ok(userEntity);
             } else {

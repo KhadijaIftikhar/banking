@@ -26,4 +26,8 @@ public class AuthAccessTokenService {
         token.setToken(jwtService.createJwt(loginRequest.getUsername()));
         return authAccessTokenRepository.save(token);
     }
+
+    public AuthAccessTokenEntity ValidatedTokenFormDatabase(Long id) {
+        return authAccessTokenRepository.findByUserId(id);
+    }
 }
