@@ -1,18 +1,14 @@
 package com.projects.banking.Controllers;
 
-import com.google.gson.Gson;
 import com.projects.banking.DTO.OTPRequest;
 import com.projects.banking.DTO.UserRequest;
 import com.projects.banking.Entities.UserEntity;
-import com.projects.banking.ExternalAPIServices.DTO.IPInfoResponse;
 import com.projects.banking.ExternalAPIServices.IPInfoService;
-import com.projects.banking.ExternalAPIServices.SMSGatewayCenterService;
-import com.projects.banking.IntergratedServices.OTPService;
-import com.projects.banking.Repositories.UserRepository;
+import com.projects.banking.Helpers.AgeCalculator;
 import com.projects.banking.Services.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,17 +16,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.projects.banking.ExternalAPIServices.TwilioService;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.time.LocalDate;
+
 @RestController
+@Tag(name = "Authentication APIs")
 public class AuthController {
 
 
 
     @Autowired
     private UserService userService;
+
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRequest userRequest, BindingResult bindingResult) {
@@ -39,6 +36,16 @@ public class AuthController {
             String countryCode = IPInfoService.getCountryCode();
             if(!("NL".equals(countryCode) || "BE".equals(countryCode) || "PK".equals(countryCode))){
                 return ResponseEntity.ok("Sorry, you're not eligible for this registration.");
+            }
+
+            LocalDate currentDate = LocalDate.now();
+            if(AgeCalculator.calculateAge(userRequest.getDateOfBirth(), currentDate) < 18) {
+                return ResponseEntity.ok("Sorry, you're not eligible for this registration.");
+            }
+
+            UserEntity existingUserCheck = userService.findCustomerByUsername(userRequest.getUsername());
+            if(existingUserCheck != null) {
+                return ResponseEntity.ok("Oops, username already exists.");
             }
 
             // getting any validation errors while creating customer registration
@@ -54,27 +61,32 @@ public class AuthController {
             }
         } catch (Exception exception) {
             exception.printStackTrace();
-            return ResponseEntity.badRequest().body("Something went wrong."+ userRequest.getMobileNumber());
+            return ResponseEntity.badRequest().body("Something went wrong.");
         }
         return ResponseEntity.ok("Customer has been Created but need to be Verify by OTP.");
     }
 
     @PostMapping("/verifyOTP")
-    public ResponseEntity<?> verifyOTP (@Valid @RequestBody OTPRequest otpRequest) {
+    public ResponseEntity<?> verifyOTP (@RequestBody @Valid OTPRequest otpRequest, BindingResult bindingResult) {
 
         try {
+            // getting any validation errors while creating customer registration
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+            }
+
             UserEntity userEntity = userService.findCustomerByUsername(otpRequest.getUsername());
-            if(userEntity.getId() != 0) {
+            if(userEntity != null) {
                 TwilioService.VerifyOTP(userEntity.getMobileNumber(), otpRequest.getOTP());
+                return ResponseEntity.ok("Congrats! Account has been registered.");
             } else {
                 return ResponseEntity.ok("Oops, Username not found.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Something went wrong.");
+            return ResponseEntity.badRequest().body("Something went wrong."+ e.getMessage());
         }
-        return ResponseEntity.ok("Congrats! Account has been registered.");
     }
 
     @PostMapping("/logon")

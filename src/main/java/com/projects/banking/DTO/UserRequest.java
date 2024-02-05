@@ -1,9 +1,12 @@
 package com.projects.banking.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.time.LocalDate;
 
@@ -12,17 +15,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class UserRequest {
     private String name;
-    @NotBlank(message = "Username Field cannot be empty.")
+    @NotEmpty(message = "Username Field cannot be empty.")
     private String username;
     private String address;
-    @NotBlank(message = "CountryName Field cannot be empty.")
+    @NotEmpty(message = "CountryName Field cannot be empty.")
     private String countryName;
     // Optional
     private String idDocument;
-
-    @NotBlank(message="Mobile Number cannot be empty.")
-    private String mobileNumber;
-
+    @NotEmpty(message="Mobile Number cannot be empty.")
+    private String mobileNumber = "+923018675410";
+    @NotNull
     private LocalDate dateOfBirth;
-
 }
