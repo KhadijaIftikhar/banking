@@ -1,6 +1,5 @@
 package com.projects.banking.Entities;
 
-import com.projects.banking.Validators.ValidUserRegister;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@ValidUserRegister
 @Table(name = "users")
 public class UserEntity {
     @Id

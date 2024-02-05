@@ -5,6 +5,8 @@ import com.projects.banking.Entities.UserEntity;
 import com.projects.banking.Helpers.IbanGenerator;
 import com.projects.banking.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -80,5 +82,14 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) {
+                return (UserDetails) userRepository.findByUsername(username);
+            }
+        };
     }
 }
