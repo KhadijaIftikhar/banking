@@ -18,8 +18,6 @@ public class UserRequest {
     @NotEmpty(message = "Username Field cannot be empty.")
     private String username;
     private String address;
-    @NotEmpty(message = "CountryName Field cannot be empty.")
-    private String countryName;
     // Optional
     private String idDocument;
     @NotEmpty(message="Mobile Number cannot be empty.")

@@ -89,8 +89,8 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/logon")
-    public String logOn() {
+    @PostMapping("/logIn")
+    public String logIn() {
 
         return "";
     }
