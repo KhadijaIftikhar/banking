@@ -72,4 +72,13 @@ public class UserService {
         // Generate a positive random number within the specified range
         return min + Math.abs(random.nextLong()) % (max - min + 1);
     }
+
+    public UserEntity updateCustomerVerification(UserEntity userEntity, int isVerified) {
+        try {
+            userEntity.setIsVerified(isVerified);
+            return userRepository.save(userEntity);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

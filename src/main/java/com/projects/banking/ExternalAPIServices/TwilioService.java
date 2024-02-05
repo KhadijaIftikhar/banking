@@ -32,7 +32,7 @@ public class TwilioService {
                 .setTo(mobileNumber)
                 .setCode(OTP)
                 .create();
-
+        System.out.println("Status:: "+ verificationCheck.getStatus());
         return verificationCheck.getStatus();
     }
 }
