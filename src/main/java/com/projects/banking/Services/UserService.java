@@ -82,4 +82,8 @@ public class UserService {
         }
     }
 
+    public UserEntity findByCustomerCredentials( String username, String password) {
+        return userRepository.findByUsernameAndPassword(username, password);
+    }
+
 }
