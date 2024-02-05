@@ -78,7 +78,9 @@ public class AuthController {
             UserEntity userEntity = userService.findCustomerByUsername(otpRequest.getUsername());
             if(userEntity != null) {
                 TwilioService.VerifyOTP(userEntity.getMobileNumber(), otpRequest.getOTP());
-                userService.updateCustomerVerification(userEntity,1);
+                if(userService.updateCustomerVerification(userEntity,1) == null) {
+                    return ResponseEntity.ok("Oops! Not Updated User.");
+                }
                 return ResponseEntity.ok("Congrats! Account has been registered.");
             } else {
                 return ResponseEntity.ok("Oops, Username not found.");
