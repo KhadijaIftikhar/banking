@@ -46,7 +46,7 @@ public class AuthController {
         try {
             // Country Validation By IP Address
             String countryCode = IPInfoService.getCountryCode();
-            if(!("NL".equals(countryCode) || "BE".equals(countryCode) || "PK".equals(countryCode))){
+            if(!("NL".equals(countryCode) || "BE".equals(countryCode))){
                 return ResponseEntity.badRequest().body("Sorry, your country not eligible for this registration.");
             }
 
