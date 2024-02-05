@@ -1,5 +1,7 @@
 package com.projects.banking.Controllers;
 
+import com.projects.banking.DTO.CustomerOverviewRequest;
+import com.projects.banking.DTO.CustomerOverviewResponse;
 import com.projects.banking.DTO.OTPRequest;
 import com.projects.banking.DTO.UserRequest;
 import com.projects.banking.Entities.UserEntity;
@@ -11,9 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.projects.banking.ExternalAPIServices.TwilioService;
 
 import java.time.LocalDate;
@@ -96,5 +96,26 @@ public class AuthController {
     public String logIn() {
 
         return "";
+    }
+
+    @GetMapping("/overview")
+    public ResponseEntity<?> overview(CustomerOverviewRequest customerOverviewRequest, BindingResult bindingResult) {
+        try{
+            // getting any validation errors while creating customer registration
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+            }
+
+
+            UserEntity userEntity = userService.findCustomerByUsername(customerOverviewRequest.getUsername());
+            if(userEntity != null) {
+                return ResponseEntity.ok(userEntity);
+            } else {
+                return ResponseEntity.ok("Oops, Username not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Something went wrong."+ e.getMessage());
+        }
     }
 }

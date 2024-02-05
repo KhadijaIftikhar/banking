@@ -1,5 +1,6 @@
 package com.projects.banking.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class UserEntity {
     private String username;
     private String address;
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
     // idDocument Path
     private String idDocument;
