@@ -21,7 +21,7 @@ public class UserRequest {
     // Optional
     private String idDocument;
     @NotEmpty(message="Mobile Number cannot be empty.")
-    private String mobileNumber = "+923018675410";
+    private String mobileNumber;
     @NotNull
     private LocalDate dateOfBirth;
 }

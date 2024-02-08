@@ -121,7 +121,7 @@ public class AuthController {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
             }
-            // BYPASS Password for Now
+
             UserEntity userEntity = userService.findByCustomerCredentials(loginRequest.getUsername(), loginRequest.getPassword());
             if(userEntity != null) {
                 AuthAccessTokenEntity token = authAccessTokenService.saveToken(loginRequest,userEntity);

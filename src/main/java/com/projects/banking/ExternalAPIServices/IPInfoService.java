@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 public class IPInfoService {
 
 
-    private static final String ACCESS_TOKEN_KEY = "fe5137c48716cc";
+    private static final String ACCESS_TOKEN_KEY = "ccc7edd0df2eb5";
     private static IPInfoResponse ipInfoResponse;
     public static String getCountryCode() {
         HttpClient httpClient = HttpClient.newHttpClient();

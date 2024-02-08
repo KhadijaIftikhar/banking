@@ -45,7 +45,6 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-
             return claims;
         } catch (SignatureException e) {
             // The token signature is not valid
