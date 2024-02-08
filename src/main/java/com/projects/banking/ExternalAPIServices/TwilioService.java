@@ -15,7 +15,7 @@ public class TwilioService {
     private static Environment env;
 
     public static String initiateTwilio(String mobileNumber) {
-        Twilio.init("AC2ffafc9e4be7a1bfde5b0a24f60e3a6c", "8c394b99e7ba287c8955a134a192ecf0");
+        Twilio.init("AC2ffafc9e4be7a1bfde5b0a24f60e3a6c", "741bf581d08a95396a83f2182b9d6ca2");
        // Service service = Service.creator("Bank OTP Service").create();
         Verification verification = Verification.creator(
                         verifySid, // this is your verification sid
@@ -26,7 +26,7 @@ public class TwilioService {
     }
 
     public static String VerifyOTP (String mobileNumber,String OTP){
-        Twilio.init("AC2ffafc9e4be7a1bfde5b0a24f60e3a6c", "8c394b99e7ba287c8955a134a192ecf0");
+        Twilio.init("AC2ffafc9e4be7a1bfde5b0a24f60e3a6c", "741bf581d08a95396a83f2182b9d6ca2");
         VerificationCheck verificationCheck = VerificationCheck.creator(
                         verifySid)
                 .setTo(mobileNumber)
