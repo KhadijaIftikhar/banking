@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AuthAccessTokenRepository  extends JpaRepository<AuthAccessTokenEntity, Long> {
 
-    public AuthAccessTokenEntity findByUserId(Long id);
+    public void deleteAllByUserId(Long userId);
+    public AuthAccessTokenEntity findByUserId(Long userId);
 }

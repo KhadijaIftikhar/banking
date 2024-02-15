@@ -8,6 +8,7 @@ import com.projects.banking.ExternalAPIServices.JwtService;
 import com.projects.banking.Helpers.AgeCalculator;
 import com.projects.banking.Services.AuthAccessTokenService;
 import com.projects.banking.Services.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -67,15 +68,18 @@ public class AuthController {
 
             // getting any errors while creating customer registration
             UserEntity userEntity = userService.saveCustomer(userRequest);
-
+            UserResponse userResponse = new UserResponse();
+            userResponse.setUsername(userEntity.getUsername());
+            userResponse.setPassword(userEntity.getPassword());
+            userResponse.setMessage("Customer has been Created but need to be Verify by OTP.");
             if(userEntity.getId() != 0) {
                 TwilioService.initiateTwilio(userRequest.getMobileNumber());
             }
+            return ResponseEntity.ok(userResponse);
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseEntity.badRequest().body("Something went wrong.");
         }
-        return ResponseEntity.ok("Customer has been Created but need to be Verify by OTP.");
     }
 
     @Operation(summary = "OTP API", description = "OTP verification By Phone.")
@@ -109,10 +113,38 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "LogIn API", description = "Login API with Using Default password - 123456")
+    @Operation(summary = "TOKEN API", description = "TOKEN API with using Default password")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Return User Object with Token Information."),
-            @ApiResponse(responseCode = "400", description = "Oops, Invalid Credentials.")
+            @ApiResponse(responseCode = "200", description = "Return Token."),
+            @ApiResponse(responseCode = "400", description = "Oops! Invalid Credentials.")
+    })
+    @PostMapping("/token")
+    public ResponseEntity<?> getToken(@RequestBody TokenRequest tokenRequest, BindingResult bindingResult) {
+        try{
+            // getting any validation errors while creating customer registration
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+            }
+
+            UserEntity userEntity = userService.findByCustomerCredentials(tokenRequest.getUsername(), tokenRequest.getPassword());
+            if(userEntity != null) {
+                AuthAccessTokenEntity token = authAccessTokenService.saveToken(tokenRequest,userEntity);
+                TokenResponse tokenResponse = new TokenResponse();
+                tokenResponse.setToken(token.getToken());
+                return ResponseEntity.ok(tokenResponse);
+            } else {
+                return ResponseEntity.badRequest().body("Oops! Invalid Credentials.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Oops! Something went wrong.");
+        }
+    }
+
+    @Operation(summary = "Login API", description = "Login API with using token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return Success Response."),
+            @ApiResponse(responseCode = "400", description = "Oops! Invalid Token.")
     })
     @PostMapping("/logIn")
     public ResponseEntity<?> logIn(@RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
@@ -122,20 +154,21 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
             }
 
-            UserEntity userEntity = userService.findByCustomerCredentials(loginRequest.getUsername(), loginRequest.getPassword());
-            if(userEntity != null) {
-                AuthAccessTokenEntity token = authAccessTokenService.saveToken(loginRequest,userEntity);
-                LoginResponse loginResponse = new LoginResponse();
-                loginResponse.setUserEntity(userEntity);
-                loginResponse.setToken(token.getToken());
-                loginResponse.setExpiryAt(token.getExpiryAt());
-                return ResponseEntity.ok(loginResponse);
-            } else {
-                return ResponseEntity.badRequest().body("Oops, Invalid Credentials.");
+            if(jwtService.isTokenExpired(loginRequest.getToken())) {
+                return ResponseEntity.badRequest().body("Oop! Time-out. Token has been expired.");
             }
+
+            UserEntity userEntity = userService.findCustomerByUsername(loginRequest.getUsername());
+            if(userEntity == null) {
+                return ResponseEntity.badRequest().body("Oops! User not found.");
+            }
+
+            return ResponseEntity.ok("Success! Welcome, "+userEntity.getUsername());
+        }  catch (ExpiredJwtException e) {
+            return ResponseEntity.badRequest().body("Oop! Time-out. Token has been expired.");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Something went wrong."+ e.getMessage());
+            return ResponseEntity.badRequest().body("Error! Invalid token.");
         }
     }
 
@@ -157,20 +190,17 @@ public class AuthController {
             }
 
             UserEntity userEntity = userService.findCustomerByUsername(customerOverviewRequest.getUsername());
-
-            String token = authAccessTokenService.ValidatedTokenFormDatabase(userEntity.getId()).getToken();
-            if(jwtService.validateToken(customerOverviewRequest.getToken()).getId().isEmpty() ||  jwtService.validateToken(token).getId().isEmpty()) {
-                return ResponseEntity.badRequest().body("Oops, Invalid User!.");
+            if(userEntity == null) {
+                return ResponseEntity.badRequest().body("Oops! Username not found.");
             }
-
-            if(userEntity != null) {
-                return ResponseEntity.ok(userEntity);
-            } else {
-                return ResponseEntity.badRequest().body("Oops, Username not found.");
-            }
+            String token = authAccessTokenService.findTokenByUserId(userEntity.getId()).getToken();
+//            if(jwtService.validateToken(customerOverviewRequest.getToken()).getId().isEmpty() ||  jwtService.validateToken(token).getId().isEmpty()) {
+//                return ResponseEntity.badRequest().body("Oops, Invalid User!.");
+//            }
+            return ResponseEntity.ok(userEntity);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Something went wrong."+ e.getMessage());
+            return ResponseEntity.badRequest().body("Oops! Something went wrong.");
         }
     }
 }

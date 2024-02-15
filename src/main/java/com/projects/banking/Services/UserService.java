@@ -35,7 +35,8 @@ public class UserService {
             userEntity.setName(userRequest.getName());
         }
         userEntity.setUsername(userRequest.getUsername());
-        userEntity.setPassword("123456");
+        String password =  Long.toString(generateRandomNumber(8, RANDOM));
+        userEntity.setPassword(password);
         userEntity.setAddress(userRequest.getAddress());
         userEntity.setDateOfBirth(userRequest.getDateOfBirth());
         userEntity.setIdDocument(userRequest.getIdDocument());
@@ -52,13 +53,10 @@ public class UserService {
 
     /**
      *
-     * @return String
+     * @param digits int
+     * @param random Random
+     * @return long
      */
-    private static String generateRandomOTP() {
-       long otp = generateRandomNumber(6, RANDOM);
-       return Long.toString(otp);
-    }
-
     private static long generateRandomNumber(int digits, Random random) {
         // Ensure the digits parameter is valid
         if (digits <= 0) {
@@ -73,6 +71,12 @@ public class UserService {
         return min + Math.abs(random.nextLong()) % (max - min + 1);
     }
 
+    /**
+     *
+     * @param userEntity UserEntity
+     * @param isVerified int
+     * @return userEntity
+     */
     public UserEntity updateCustomerVerification(UserEntity userEntity, int isVerified) {
         try {
             userEntity.setIsVerified(isVerified);
@@ -82,6 +86,12 @@ public class UserService {
         }
     }
 
+    /**
+     *
+     * @param username String
+     * @param password String
+     * @return UserEntity
+     */
     public UserEntity findByCustomerCredentials( String username, String password) {
         return userRepository.findByUsernameAndPassword(username, password);
     }
