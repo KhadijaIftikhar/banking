@@ -193,11 +193,13 @@ public class AuthController {
             if(userEntity == null) {
                 return ResponseEntity.badRequest().body("Oops! Username not found.");
             }
-            String token = authAccessTokenService.findTokenByUserId(userEntity.getId()).getToken();
-//            if(jwtService.validateToken(customerOverviewRequest.getToken()).getId().isEmpty() ||  jwtService.validateToken(token).getId().isEmpty()) {
-//                return ResponseEntity.badRequest().body("Oops, Invalid User!.");
-//            }
-            return ResponseEntity.ok(userEntity);
+
+            CustomerOverviewResponse customerOverviewResponse = new CustomerOverviewResponse();
+            customerOverviewResponse.setAccountNumber(userEntity.getIBAN());
+            customerOverviewResponse.setAccountType(userEntity.getAccountType());
+            customerOverviewResponse.setBalance(userEntity.getBalance());
+            customerOverviewResponse.setCurrency("Euro");
+            return ResponseEntity.ok(customerOverviewResponse);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Oops! Something went wrong.");

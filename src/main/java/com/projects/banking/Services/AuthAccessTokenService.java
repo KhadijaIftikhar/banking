@@ -37,11 +37,4 @@ public class AuthAccessTokenService {
         return authAccessTokenRepository.findByUserId(id);
     }
 
-    public boolean isTokenExpired (String token) {
-        Claims claims = jwtService.parseJwt(token);
-        Instant instant = claims.getExpiration().toInstant();
-        LocalDateTime expirationDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-        return expirationDate.isBefore(now);
-    }
 }
